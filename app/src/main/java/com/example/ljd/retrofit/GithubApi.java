@@ -10,19 +10,13 @@ import rx.Observable;
 /**
  * Created by ljd on 3/25/16.
  */
-public interface GithubApi {
+public interface GitHubApi {
 
 
-    /**
-     * See https://developer.github.com/v3/repos/#list-contributors
-     */
     @GET("/repos/{owner}/{repo}/contributors")
     Observable<List<Contributor>> contributors(@Path("owner") String owner,
                                                @Path("repo") String repo);
 
-    /**
-     * See https://developer.github.com/v3/users/
-     */
     @GET("/users/{user}")
     Observable<User> user(@Path("user") String user);
 

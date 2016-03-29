@@ -18,11 +18,11 @@ import static java.lang.String.format;
 /**
  * Created by ljd on 3/25/16.
  */
-public class GithubService {
+public class GitHubService {
 
-    private GithubService() { }
+    private GitHubService() { }
 
-    public static GithubApi createGithubService(final String githubToken) {
+    public static GitHubApi createGitHubService(final String githubToken) {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("https://api.github.com");
@@ -47,6 +47,6 @@ public class GithubService {
         }
         OkHttpClient client = clientBuilder.build();
         retrofitBuilder.client(client);
-        return retrofitBuilder.build().create(GithubApi.class);
+        return retrofitBuilder.build().create(GitHubApi.class);
     }
 }

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">retrofit-example</string>
+    <string name="retrofit_rxJava">retrofit+rxJava</string>
+    <string name="github_token"></string>
 </resources>
