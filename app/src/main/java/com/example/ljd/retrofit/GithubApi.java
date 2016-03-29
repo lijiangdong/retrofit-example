@@ -1,13 +1,23 @@
 package com.example.ljd.retrofit;
 
 import com.example.ljd.retrofit.pojo.Contributor;
+import com.example.ljd.retrofit.pojo.Retrofit;
 import com.example.ljd.retrofit.pojo.User;
 
 import java.util.List;
+import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FieldMap;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 import rx.Observable;
 
 /**
@@ -15,21 +25,45 @@ import rx.Observable;
  */
 public interface GitHubApi {
 
+    @Headers({
+            "Accept: application/vnd.github.v3.full+json",
+            "User-Agent: Retrofit-Sample-App",
+            "name:ljd"
+    })
+    @GET("/repos/{owner}/{repo}/contributors")
+    Call<ResponseBody> contributorsAndAddHeader(@Path("owner") String owner,
+                                                @Path("repo") String repo);
+
+    @GET("/repos/{owner}/{repo}/contributors")
+    Call<List<Contributor>> contributorsByGetCall(@Path("owner") String owner,
+                                                  @Path("repo") String repo);
+
+    @GET("/search/repositories")
+    Call<Retrofit> queryRetrofitByGetCall(@Query("q")String owner,
+                                          @Query("since")String time,
+                                          @Query("page")int page,
+                                          @Query("per_page")int per_Page);
+
+    @GET("/search/repositories")
+    Call<Retrofit> queryRetrofitByGetCallMap(@QueryMap Map<String,String> map);
+
+    @FormUrlEncoded
+    @POST("/search/repositories")
+    Call<Retrofit> queryRetrofitByPostField(@Field("q")String owner,
+                                            @Field("since")String time,
+                                            @Field("page")int page,
+                                            @Field("per_page")int per_Page);
+
+    @FormUrlEncoded
+    @POST("/search/repositories")
+    Call<Retrofit> queryRetrofitByPostFieldMap(@FieldMap Map<String,String> fieldMap);
 
     @GET("/repos/{owner}/{repo}/contributors")
     Observable<List<Contributor>> contributorsByRxJava(@Path("owner") String owner,
-                                               @Path("repo") String repo);
+                                                       @Path("repo") String repo);
 
     @GET("/users/{user}")
     Observable<User> userByRxJava(@Path("user") String user);
 
 
-    @GET("/repos/{owner}/{repo}/contributors")
-    Call<List<Contributor>> contributorsByGetCall(@Path("owner") String owner,
-                                               @Path("repo") String repo);
-
-
-    @GET("/repos/{owner}/{repo}/contributors")
-    Call<List<Contributor>> contributors2(@Path("owner") String owner,
-                                          @Path("repo") String repo);
 }

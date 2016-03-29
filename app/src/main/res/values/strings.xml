@@ -1,10 +1,9 @@
 <resources>
     <string name="app_name">retrofit-example</string>
-    <string name="retrofit_rxJava">retrofit+rxJava</string>
-    <string name="retrofit_get">get请求</string>
-    <string name="github_token"></string>
+    <string name="github_token">9d43774b1ce07bc1abb84310252bc87b2f036a50</string>
     <string name="clear">清空</string>
-
+    <string name="user_name">square</string>
+    <string name="repo">retrofit</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
