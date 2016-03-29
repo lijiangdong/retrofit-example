@@ -35,7 +35,8 @@ public class GitHubService {
         if (!TextUtils.isEmpty(githubToken)) {
 
              clientBuilder.addInterceptor(new Interceptor() {
-                @Override public Response intercept(Chain chain) throws IOException {
+                @Override
+                public Response intercept(Chain chain) throws IOException {
                     Request request = chain.request();
                     Request newReq = request.newBuilder()
                             .addHeader("Authorization", format("token %s", githubToken))

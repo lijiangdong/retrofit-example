@@ -18,6 +18,12 @@
         >
 
         <Button
+            android:id="@+id/btn_retrofit_get"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/retrofit_get"/>
+
+        <Button
             android:id="@+id/btn_retrofit_rxjava"
             android:layout_height="wrap_content"
             android:layout_width="match_parent"

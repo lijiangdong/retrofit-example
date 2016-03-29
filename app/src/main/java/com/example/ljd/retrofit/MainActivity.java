@@ -5,9 +5,9 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import com.example.ljd.retrofit.fragment.MainFragment;
+import com.example.ljd.retrofit.pojo.Contributor;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void requestGitHubContributors(){
-        Call<List<Contributor>> call = gitHubService.contributors1("square", "retrofit");
+        Call<List<Contributor>> call = gitHubService.contributorsByGetCall("square", "retrofit");
         call.enqueue(new Callback<List<Contributor>>() {
             @Override
             public void onResponse(Call<List<Contributor>> call, Response<List<Contributor>> response) {
@@ -59,8 +59,8 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
                 List<Contributor> list = response.body();
                 Log.e("string", response.body().toString());
                 for (Contributor contributor : list) {
-                    Log.d("login", contributor.login);
-                    Log.d("contributions", contributor.contributions + "");
+                    Log.d("login", contributor.getLogin());
+                    Log.d("contributions", contributor.getContributions() + "");
                 }
             }
 

@@ -31,11 +31,14 @@ public class MainFragment extends Fragment{
         ButterKnife.unbind(this);
     }
 
-    @OnClick({R.id.btn_retrofit_rxjava})
+    @OnClick({R.id.btn_retrofit_rxjava,R.id.btn_retrofit_get})
     public void onClick(View v){
         switch (v.getId()){
             case R.id.btn_retrofit_rxjava:
                 clickedOn(new RxJavaRetrofitFragment());
+                break;
+            case R.id.btn_retrofit_get:
+                clickedOn(new RetrofitGetFragment());
                 break;
         }
     }
@@ -47,6 +50,5 @@ public class MainFragment extends Fragment{
                 .replace(android.R.id.content, fragment, tag)
                 .commit();
     }
-
 
 }

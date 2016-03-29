@@ -3,7 +3,6 @@ package com.example.ljd.retrofit.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.example.ljd.retrofit.Contributor;
+import com.example.ljd.retrofit.pojo.Contributor;
 import com.example.ljd.retrofit.GitHubApi;
 import com.example.ljd.retrofit.GitHubService;
 import com.example.ljd.retrofit.R;
 import com.example.ljd.retrofit.RxUtils;
-import com.example.ljd.retrofit.User;
+import com.example.ljd.retrofit.pojo.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,8 +59,8 @@ public class RxJavaRetrofitFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String githubToken = getResources().getString(R.string.github_token);
-        gitHubService = GitHubService.createGitHubService(githubToken);
+        String gitHubToken = getResources().getString(R.string.github_token);
+        gitHubService = GitHubService.createGitHubService(gitHubToken);
     }
 
     @Override
@@ -95,7 +94,7 @@ public class RxJavaRetrofitFragment extends Fragment {
     @OnClick(R.id.btn_demo_retrofit_contributors)
     public void requestGitHubContributors(){
         subscriptions.add(//
-                gitHubService.contributors(mUsername.getText().toString(), mRepo.getText().toString())
+                gitHubService.contributorsByRxJava(mUsername.getText().toString(), mRepo.getText().toString())
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Observer<List<Contributor>>() {
@@ -113,13 +112,13 @@ public class RxJavaRetrofitFragment extends Fragment {
                             public void onNext(List<Contributor> contributors) {
                                 for (Contributor c : contributors) {
                                     mAdapter.add(format("%s has made %d contributions to %s",
-                                            c.login,
-                                            c.contributions,
+                                            c.getLogin(),
+                                            c.getContributions(),
                                             mRepo.getText().toString()));
 
                                     Timber.d("%s has made %d contributions to %s",
-                                            c.login,
-                                            c.contributions,
+                                            c.getLogin(),
+                                            c.getContributions(),
                                             mRepo.getText().toString());
                                 }
                             }
@@ -128,7 +127,7 @@ public class RxJavaRetrofitFragment extends Fragment {
 
     @OnClick(R.id.btn_demo_retrofit_contributors_with_user_info)
     public void requestGitHubContributorsWithFullUserInfo(){
-        subscriptions.add(gitHubService.contributors("square", "retrofit")
+        subscriptions.add(gitHubService.contributorsByRxJava("square", "retrofit")
                 .flatMap(new Func1<List<Contributor>, Observable<Contributor>>() {
                     @Override
                     public Observable<Contributor> call(List<Contributor> contributors) {
@@ -138,11 +137,11 @@ public class RxJavaRetrofitFragment extends Fragment {
                 .flatMap(new Func1<Contributor, Observable<Pair<User, Contributor>>>() {
                     @Override
                     public Observable<Pair<User, Contributor>> call(Contributor contributor) {
-                        Observable<User> userObservable = gitHubService.user(contributor.login)
+                        Observable<User> userObservable = gitHubService.userByRxJava(contributor.getLogin())
                                 .filter(new Func1<User, Boolean>() {
                                     @Override
                                     public Boolean call(User user) {
-                                        return !isEmpty(user.name) && !isEmpty(user.email);
+                                        return !isEmpty(user.getName()) && !isEmpty(user.getEmail());
                                     }
                                 });
 
@@ -175,16 +174,16 @@ public class RxJavaRetrofitFragment extends Fragment {
                         Contributor contributor = pair.second;
 
                         mAdapter.add(format("%s(%s) has made %d contributions to %s",
-                                user.name,
-                                user.email,
-                                contributor.contributions,
+                                user.getName(),
+                                user.getEmail(),
+                                contributor.getContributions(),
                                 mRepo.getText().toString()));
                         mAdapter.notifyDataSetChanged();
 
                         Timber.d("%s(%s) has made %d contributions to %s",
-                                user.name,
-                                user.email,
-                                contributor.contributions,
+                                user.getName(),
+                                user.getEmail(),
+                                contributor.getContributions(),
                                 mRepo.getText().toString());
 
                     }
