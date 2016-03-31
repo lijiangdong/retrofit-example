@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by ljd on 3/29/16.
  */
-public class Retrofit {
+public class RetrofitBean {
 
     private Integer total_count;
     private Boolean incompleteResults;

@@ -22,7 +22,7 @@ public class GitHubService {
 
     private GitHubService() { }
 
-    public static GitHubApi createGitHubService(final String githubToken) {
+    public static GitHubApi createGitHubService() {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("https://api.github.com");
@@ -31,21 +31,20 @@ public class GitHubService {
 
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        clientBuilder.addInterceptor(httpLoggingInterceptor);
-        if (!TextUtils.isEmpty(githubToken)) {
-
-             clientBuilder.addInterceptor(new Interceptor() {
-                @Override public Response intercept(Chain chain) throws IOException {
-                    Request request = chain.request();
-                    Request newReq = request.newBuilder()
-                            .addHeader("Authorization", format("token %s", githubToken))
-                            .build();
-                    return chain.proceed(newReq);
-                }
-            });
-        }
+        clientBuilder.addInterceptor(httpLoggingInterceptor)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request request = chain.request();
+                        Request newReq = request.newBuilder()
+                                .addHeader("AddHeaderByInterceptor", "add success")
+                                .build();
+                        return chain.proceed(newReq);
+                    }
+                });
         OkHttpClient client = clientBuilder.build();
         retrofitBuilder.client(client);
         return retrofitBuilder.build().create(GitHubApi.class);
     }
+
 }

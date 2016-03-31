@@ -12,7 +12,7 @@ import android.view.View;
 import com.example.ljd.retrofit.pojo.Contributor;
 import com.example.ljd.retrofit.pojo.Item;
 import com.example.ljd.retrofit.pojo.Owner;
-import com.example.ljd.retrofit.pojo.Retrofit;
+import com.example.ljd.retrofit.pojo.RetrofitBean;
 import com.example.ljd.retrofit.pojo.User;
 
 import java.io.BufferedInputStream;
@@ -32,6 +32,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import rx.Observable;
@@ -74,13 +75,13 @@ public class MainActivity extends FragmentActivity{
 
     private void initData(){
         ButterKnife.bind(this);
-        mGitHubService = GitHubService.createGitHubService(getString(R.string.github_token));
+        mGitHubService = GitHubService.createGitHubService();
         mSubscriptions = RxUtils.getNewCompositeSubIfUnsubscribed(mSubscriptions);
         mUserName = getResources().getString(R.string.user_name);
         mRepo = getResources().getString(R.string.repo);
     }
 
-    @OnClick({R.id.btn_retrofit_get_contributors,
+    @OnClick({R.id.btn_retrofit_simple_contributors,
             R.id.btn_add_header_contributors,
             R.id.btn_retrofit_sync_contributors,
             R.id.btn_retrofit_get_query,
@@ -99,8 +100,8 @@ public class MainActivity extends FragmentActivity{
         queryMap.put("page","1");
         queryMap.put("per_page", "3");
         switch (v.getId()){
-            case R.id.btn_retrofit_get_contributors:
-                requestGitHubContributorsByGet();
+            case R.id.btn_retrofit_simple_contributors:
+                requestGitHubContributorsSimple();
                 break;
             case R.id.btn_retrofit_sync_contributors:
                 requestGitHubContributorsBySync();
@@ -132,47 +133,54 @@ public class MainActivity extends FragmentActivity{
         }
     }
 
+
+    public void requestGitHubContributorsSimple(){
+
+        Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("https://api.github.com")
+                .build();
+        GitHubApi repo = retrofit.create(GitHubApi.class);
+
+        Call<ResponseBody> call = repo.contributorsBySimpleGetCall(mUserName, mRepo);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    Log.e(TAG, response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
     public void requestGitHubContributorsBySync(){
-        final Call<List<Contributor>> call = mGitHubService.contributorsByGetCall(mUserName, mRepo);
+
+        Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("https://api.github.com")
+                .build();
+        GitHubApi repo = retrofit.create(GitHubApi.class);
+
+        final Call<ResponseBody> call = repo.contributorsBySimpleGetCall(mUserName, mRepo);
         new Thread(new Runnable() {
             @Override
             public void run() {
 
                 try {
-                    Response<List<Contributor>> response = call.execute();
-                    final List<Contributor> list = response.body();
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (Contributor c : list) {
-                                Log.d("TAG", "login:" + c.getLogin() + "  contributions:" + c.getContributions());
-                            }
-                        }
-                    });
+                    Response<ResponseBody> response = call.execute();
+                    Log.e(TAG,response.body().string());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-    }
-
-    public void requestGitHubContributorsByGet(){
-        Call<List<Contributor>> call = mGitHubService.contributorsByGetCall(mUserName, mRepo);
-        call.enqueue(new Callback<List<Contributor>>() {
-            @Override
-            public void onResponse(Call<List<Contributor>> call, Response<List<Contributor>> response) {
-                List<Contributor> list = response.body();
-                for (Contributor c : list) {
-                    Log.d("TAG", "login:" + c.getLogin() + "  contributions:" + c.getContributions());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Contributor>> call, Throwable t) {
-
-            }
-        });
     }
 
     public void requestAddHeader(){
@@ -181,7 +189,6 @@ public class MainActivity extends FragmentActivity{
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
-                    Log.e(TAG,response.message());
                     Log.e(TAG,response.body().string());
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -196,18 +203,20 @@ public class MainActivity extends FragmentActivity{
     }
 
     public void requestQueryRetrofitByGet(Map<String,String> fieldMap){
-        Call<Retrofit> call;
+        Call<RetrofitBean> call;
         if (fieldMap == null || fieldMap.size() == 0){
             call = mGitHubService.queryRetrofitByPostField("retrofit", "2016-03-29", 1, 3);
         } else {
             call = mGitHubService.queryRetrofitByPostFieldMap(fieldMap);
         }
 
-        call.enqueue(new Callback<Retrofit>() {
+        call.enqueue(new Callback<RetrofitBean>() {
             @Override
-            public void onResponse(Call<Retrofit> call, Response<Retrofit> response) {
-                Retrofit retrofit = response.body();
+            public void onResponse(Call<RetrofitBean> call, Response<RetrofitBean> response) {
+                RetrofitBean retrofit = response.body();
                 List<Item> list = retrofit.getItems();
+                if (list == null)
+                    return;
                 Log.d(TAG,"total:" + retrofit.getTotalCount());
                 Log.d(TAG,"incompleteResults:" + retrofit.getIncompleteResults());
                 Log.d(TAG,"----------------------");
@@ -223,27 +232,27 @@ public class MainActivity extends FragmentActivity{
             }
 
             @Override
-            public void onFailure(Call<Retrofit> call, Throwable t) {
+            public void onFailure(Call<RetrofitBean> call, Throwable t) {
 
             }
         });
     }
 
     public void requestQueryRetrofitByPost(Map<String,String> queryMap){
-        Call<Retrofit> call;
+        Call<RetrofitBean> call;
         if (queryMap == null || queryMap.size() == 0){
             call = mGitHubService.queryRetrofitByGetCall("retrofit", "2016-03-29", 1, 3);
         } else {
             call = mGitHubService.queryRetrofitByGetCallMap(queryMap);
         }
 
-        call.enqueue(new Callback<Retrofit>() {
+        call.enqueue(new Callback<RetrofitBean>() {
             @Override
-            public void onResponse(Call<Retrofit> call, Response<Retrofit> response) {
-                Retrofit retrofit = response.body();
-                List<Item> list = retrofit.getItems();
-                Log.d(TAG,"total:" + retrofit.getTotalCount());
-                Log.d(TAG,"incompleteResults:" + retrofit.getIncompleteResults());
+            public void onResponse(Call<RetrofitBean> call, Response<RetrofitBean> response) {
+                RetrofitBean retrofitBean = response.body();
+                List<Item> list = retrofitBean.getItems();
+                Log.d(TAG,"total:" + retrofitBean.getTotalCount());
+                Log.d(TAG,"incompleteResults:" + retrofitBean.getIncompleteResults());
                 Log.d(TAG,"----------------------");
                 for (Item item : list){
                     Log.d(TAG,"name:"+item.getName());
@@ -257,7 +266,7 @@ public class MainActivity extends FragmentActivity{
             }
 
             @Override
-            public void onFailure(Call<Retrofit> call, Throwable t) {
+            public void onFailure(Call<RetrofitBean> call, Throwable t) {
 
             }
         });
@@ -284,7 +293,7 @@ public class MainActivity extends FragmentActivity{
             }
         });
         OkHttpClient client =clientBuilder.build();
-        retrofit2.Retrofit.Builder retrofitBuilder = new retrofit2.Retrofit.Builder()
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("http://msoftdl.360.cn");
