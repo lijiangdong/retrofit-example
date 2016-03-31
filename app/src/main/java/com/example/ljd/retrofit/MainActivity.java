@@ -14,12 +14,15 @@ import com.example.ljd.retrofit.pojo.Item;
 import com.example.ljd.retrofit.pojo.Owner;
 import com.example.ljd.retrofit.pojo.RetrofitBean;
 import com.example.ljd.retrofit.pojo.User;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +150,12 @@ public class MainActivity extends FragmentActivity{
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
-                    Log.e(TAG, response.body().string());
+                    Gson gson = new Gson();
+                    ArrayList<Contributor> contributorsList = gson.fromJson(response.body().string(), new TypeToken<List<Contributor>>(){}.getType());
+                    for (Contributor contributor : contributorsList){
+                        Log.d("login",contributor.getLogin());
+                        Log.d("contributions",contributor.getContributions()+"");
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -175,7 +183,13 @@ public class MainActivity extends FragmentActivity{
 
                 try {
                     Response<ResponseBody> response = call.execute();
-                    Log.e(TAG,response.body().string());
+                    Gson gson = new Gson();
+                    ArrayList<Contributor> contributorsList = gson.fromJson(response.body().string(), new TypeToken<List<Contributor>>() {
+                    }.getType());
+                    for (Contributor contributor : contributorsList){
+                        Log.d("login",contributor.getLogin());
+                        Log.d("contributions",contributor.getContributions()+"");
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
