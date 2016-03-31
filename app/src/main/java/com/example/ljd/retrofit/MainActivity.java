@@ -1,7 +1,6 @@
 package com.example.ljd.retrofit;
 
 import android.os.Environment;
-import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -32,6 +31,7 @@ import butterknife.OnClick;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -85,8 +85,9 @@ public class MainActivity extends FragmentActivity{
     }
 
     @OnClick({R.id.btn_retrofit_simple_contributors,
-            R.id.btn_add_header_contributors,
             R.id.btn_retrofit_sync_contributors,
+            R.id.btn_add_okhttp_log_contributors,
+            R.id.btn_add_header_contributors,
             R.id.btn_retrofit_get_query,
             R.id.btn_retrofit_get_query_map,
             R.id.btn_rxJava_retrofit_contributors,
@@ -104,18 +105,27 @@ public class MainActivity extends FragmentActivity{
         queryMap.put("per_page", "3");
         switch (v.getId()){
             case R.id.btn_retrofit_simple_contributors:
+                //简单演示retrofit的使用
                 requestGitHubContributorsSimple();
                 break;
             case R.id.btn_retrofit_sync_contributors:
+                //同步请求
                 requestGitHubContributorsBySync();
                 break;
+            case R.id.btn_add_okhttp_log_contributors:
+                //添加okHttp的Log信息
+                requestAddOkHttpLog();
+                break;
             case R.id.btn_add_header_contributors:
+                //添加请求头
                 requestAddHeader();
                 break;
             case R.id.btn_retrofit_get_query:
+                //通过get请求，使用@Query
                 requestQueryRetrofitByGet(null);
                 break;
             case R.id.btn_retrofit_get_query_map:
+                //通过get请求，使用@QueryMap
                 requestQueryRetrofitByGet(queryMap);
                 break;
             case R.id.btn_rxJava_retrofit_contributors:
@@ -141,7 +151,7 @@ public class MainActivity extends FragmentActivity{
 
         Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("https://api.github.com")
+                .baseUrl("https://api.github.com/")
                 .build();
         GitHubApi repo = retrofit.create(GitHubApi.class);
 
@@ -172,7 +182,7 @@ public class MainActivity extends FragmentActivity{
 
         Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("https://api.github.com")
+                .baseUrl("https://api.github.com/")
                 .build();
         GitHubApi repo = retrofit.create(GitHubApi.class);
 
@@ -198,12 +208,56 @@ public class MainActivity extends FragmentActivity{
     }
 
     public void requestAddHeader(){
-        Call<ResponseBody> call = mGitHubService.contributorsAndAddHeader(mUserName, mRepo);
+
+        Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("https://api.github.com/")
+                .build();
+        GitHubApi repo = retrofit.create(GitHubApi.class);
+        Call<ResponseBody> call = repo.contributorsAndAddHeader(mUserName, mRepo);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
                     Log.e(TAG,response.body().string());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void requestAddOkHttpLog(){
+
+        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(httpLoggingInterceptor)
+                .build();
+
+        Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .baseUrl("https://api.github.com/")
+                .build();
+        GitHubApi repo = retrofit.create(GitHubApi.class);
+
+        Call<ResponseBody> call = repo.contributorsBySimpleGetCall(mUserName, mRepo);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    Gson gson = new Gson();
+                    ArrayList<Contributor> contributorsList = gson.fromJson(response.body().string(), new TypeToken<List<Contributor>>(){}.getType());
+                    for (Contributor contributor : contributorsList){
+                        Log.d("login",contributor.getLogin());
+                        Log.d("contributions",contributor.getContributions()+"");
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

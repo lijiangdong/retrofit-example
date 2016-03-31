@@ -1,6 +1,5 @@
 package com.example.ljd.retrofit;
 
-import android.text.TextUtils;
 
 import java.io.IOException;
 
@@ -13,8 +12,6 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import static java.lang.String.format;
-
 /**
  * Created by ljd on 3/25/16.
  */
@@ -25,7 +22,7 @@ public class GitHubService {
     public static GitHubApi createGitHubService() {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("https://api.github.com");
+                .baseUrl("https://api.github.com/");
 
         OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
 
