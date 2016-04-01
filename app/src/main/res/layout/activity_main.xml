@@ -13,13 +13,12 @@
         android:layout_width="match_parent"
         android:textSize="14sp"
         android:text="简单示例"/>
-
     <Button
-        android:id="@+id/btn_retrofit_sync_contributors"
+        android:id="@+id/btn_retrofit_converter_contributors"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:textSize="14sp"
-        android:text="同步请求"/>
+        android:text="转换器"/>
 
     <Button
         android:id="@+id/btn_add_okhttp_log_contributors"
@@ -27,7 +26,6 @@
         android:layout_width="match_parent"
         android:textSize="14sp"
         android:text="添加日志信息"/>
-
     <Button
         android:id="@+id/btn_add_header_contributors"
         android:layout_height="wrap_content"
@@ -35,7 +33,12 @@
         android:textSize="14sp"
         android:text="添加请求头"/>
 
-
+    <Button
+        android:id="@+id/btn_retrofit_sync_contributors"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:textSize="14sp"
+        android:text="同步请求"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -86,28 +89,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <Button
-            android:id="@+id/btn_download_retrofit"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_width="0dip"
-            android:textSize="14sp"
-            android:text="download"
-            />
-        <Button
-            android:id="@+id/btn_upload_retrofit"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_width="0dip"
-            android:textSize="14sp"
-            android:text="upload"
-            />
-        </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
             android:id="@+id/btn_rxJava_retrofit_contributors"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -125,4 +106,25 @@
             />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btn_download_retrofit"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="0dip"
+            android:textSize="14sp"
+            android:text="download"
+            />
+        <Button
+            android:id="@+id/btn_upload_retrofit"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_width="0dip"
+            android:textSize="14sp"
+            android:text="upload"
+            />
+    </LinearLayout>
 </LinearLayout>
