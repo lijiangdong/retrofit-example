@@ -19,7 +19,7 @@ public class GitHubService {
 
     private GitHubService() { }
 
-    public static <T>T createGitHubService(final Class<T> service) {
+    public static <T>T createRetrofitService(final Class<T> service) {
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())

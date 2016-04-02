@@ -28,6 +28,9 @@ public interface GitHubApi {
     @GET("repos/{owner}/{repo}/contributors")
     Call<ResponseBody> contributorsBySimpleGetCall(@Path("owner") String owner, @Path("repo") String repo);
 
+    @GET("repos/{owner}/{repo}/contributors")
+    Call<List<Contributor>> contributorsByAddConverterGetCall(@Path("owner") String owner, @Path("repo") String repo);
+
     @Headers({
             "Accept: application/vnd.github.v3.full+json",
             "User-Agent: RetrofitBean-Sample-App",

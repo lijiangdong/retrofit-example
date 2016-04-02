@@ -78,7 +78,7 @@ public class MainActivity extends FragmentActivity{
 
     private void initData(){
         ButterKnife.bind(this);
-        mGitHubService = GitHubService.createGitHubService(GitHubApi.class);
+        mGitHubService = GitHubService.createRetrofitService(GitHubApi.class);
         mSubscriptions = RxUtils.getNewCompositeSubIfUnsubscribed(mSubscriptions);
         mUserName = getResources().getString(R.string.user_name);
         mRepo = getResources().getString(R.string.repo);
@@ -161,7 +161,7 @@ public class MainActivity extends FragmentActivity{
      */
     private void requestGitHubContributorsSimple(){
 
-        Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.github.com/")
                 .build();
         GitHubApi repo = retrofit.create(GitHubApi.class);
@@ -194,31 +194,25 @@ public class MainActivity extends FragmentActivity{
      * 转换器
      */
     private void requestGitHubContributorsByConverter(){
-        Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+        Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://api.github.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         GitHubApi repo = retrofit.create(GitHubApi.class);
 
-        Call<ResponseBody> call = repo.contributorsBySimpleGetCall(mUserName, mRepo);
-        call.enqueue(new Callback<ResponseBody>() {
+        Call<List<Contributor>> call = repo.contributorsByAddConverterGetCall(mUserName, mRepo);
+        call.enqueue(new Callback<List<Contributor>>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    Gson gson = new Gson();
-                    ArrayList<Contributor> contributorsList = gson.fromJson(response.body().string(), new TypeToken<List<Contributor>>() {
-                    }.getType());
-                    for (Contributor contributor : contributorsList) {
-                        Log.d("login", contributor.getLogin());
-                        Log.d("contributions", contributor.getContributions() + "");
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+            public void onResponse(Call<List<Contributor>> call, Response<List<Contributor>> response) {
+                List<Contributor> contributorList = response.body();
+                for (Contributor contributor : contributorList){
+                    Log.d("login", contributor.getLogin());
+                    Log.d("contributions", contributor.getContributions() + "");
                 }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
+            public void onFailure(Call<List<Contributor>> call, Throwable t) {
 
             }
         });
