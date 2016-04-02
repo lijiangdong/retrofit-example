@@ -78,7 +78,7 @@ public class MainActivity extends FragmentActivity{
 
     private void initData(){
         ButterKnife.bind(this);
-        mGitHubService = GitHubService.createGitHubService();
+        mGitHubService = GitHubService.createGitHubService(GitHubApi.class);
         mSubscriptions = RxUtils.getNewCompositeSubIfUnsubscribed(mSubscriptions);
         mUserName = getResources().getString(R.string.user_name);
         mRepo = getResources().getString(R.string.repo);
@@ -156,6 +156,9 @@ public class MainActivity extends FragmentActivity{
         }
     }
 
+    /**
+     * 简单示例
+     */
     private void requestGitHubContributorsSimple(){
 
         Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -187,6 +190,9 @@ public class MainActivity extends FragmentActivity{
         });
     }
 
+    /**
+     * 转换器
+     */
     private void requestGitHubContributorsByConverter(){
         Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .baseUrl("https://api.github.com/")
@@ -218,6 +224,9 @@ public class MainActivity extends FragmentActivity{
         });
     }
 
+    /**
+     * 添加日志信息
+     */
     private void requestGitHubContributorsAddOkHttpLog(){
 
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
@@ -257,6 +266,9 @@ public class MainActivity extends FragmentActivity{
         });
     }
 
+    /**
+     * 添加请求头
+     */
     private void requestGitHubContributorsAddHeader(){
 
         Retrofit retrofit = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -281,6 +293,9 @@ public class MainActivity extends FragmentActivity{
         });
     }
 
+    /**
+     * 同步请求
+     */
     private void requestGitHubContributorsBySync(){
 
         final Call<ResponseBody> call = mGitHubService.contributorsBySimpleGetCall(mUserName, mRepo);
@@ -304,6 +319,10 @@ public class MainActivity extends FragmentActivity{
         }).start();
     }
 
+    /**
+     * get请求
+     * @param fieldMap
+     */
     private void requestQueryRetrofitByGet(Map<String,String> fieldMap){
         Call<RetrofitBean> call;
         if (fieldMap == null || fieldMap.size() == 0){
@@ -319,16 +338,16 @@ public class MainActivity extends FragmentActivity{
                 List<Item> list = retrofit.getItems();
                 if (list == null)
                     return;
-                Log.d(TAG,"total:" + retrofit.getTotalCount());
-                Log.d(TAG,"incompleteResults:" + retrofit.getIncompleteResults());
-                Log.d(TAG,"----------------------");
-                for (Item item : list){
-                    Log.d(TAG,"name:"+item.getName());
-                    Log.d(TAG,"full_name:"+item.getFull_name());
-                    Log.d(TAG,"description:"+item.getDescription());
+                Log.d(TAG, "total:" + retrofit.getTotalCount());
+                Log.d(TAG, "incompleteResults:" + retrofit.getIncompleteResults());
+                Log.d(TAG, "----------------------");
+                for (Item item : list) {
+                    Log.d(TAG, "name:" + item.getName());
+                    Log.d(TAG, "full_name:" + item.getFull_name());
+                    Log.d(TAG, "description:" + item.getDescription());
                     Owner owner = item.getOwner();
-                    Log.d(TAG,"login:"+owner.getLogin());
-                    Log.d(TAG,"type:"+owner.getType());
+                    Log.d(TAG, "login:" + owner.getLogin());
+                    Log.d(TAG, "type:" + owner.getType());
                 }
 
             }
@@ -340,6 +359,10 @@ public class MainActivity extends FragmentActivity{
         });
     }
 
+    /**
+     * post请求
+     * @param queryMap
+     */
     private void requestQueryRetrofitByPost(Map<String,String> queryMap){
         Call<RetrofitBean> call;
         if (queryMap == null || queryMap.size() == 0){
@@ -374,67 +397,9 @@ public class MainActivity extends FragmentActivity{
         });
     }
 
-    private void retrofitDownload(){
-        //监听下载进度
-        final ProgressListener progressListener = new ProgressListener() {
-            @Override
-            public void update(long bytesRead, long contentLength, boolean done) {
-                Log.e("-----",(Looper.getMainLooper() == Looper.myLooper()) +"");
-                System.out.format("%d%% done\n", (100 * bytesRead) / contentLength);
-            }
-        };
-        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        //添加拦截器，自定义ResponseBody，添加下载进度
-        clientBuilder.networkInterceptors().add(new Interceptor() {
-            @Override public okhttp3.Response intercept(Chain chain) throws IOException {
-                okhttp3.Response originalResponse = chain.proceed(chain.request());
-                return originalResponse.newBuilder().body(
-                        new ProgressResponseBody(originalResponse.body(), progressListener))
-                        .build();
-
-            }
-        });
-        OkHttpClient client =clientBuilder.build();
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("http://msoftdl.360.cn");
-        DownloadAndUploadApi retrofit = retrofitBuilder
-                .client(client)
-                .build().create(DownloadAndUploadApi.class);
-
-        Call<ResponseBody> call = retrofit.retrofitDownload();
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    InputStream is = response.body().byteStream();
-                    File file = new File(Environment.getExternalStorageDirectory(), "12345.apk");
-                    FileOutputStream fos = new FileOutputStream(file);
-                    BufferedInputStream bis = new BufferedInputStream(is);
-                    byte[] buffer = new byte[1024];
-                    int len ;
-                    int total = 0;
-                    while((len =bis.read(buffer))!=-1){
-                        fos.write(buffer, 0, len);
-                        total += len;
-                        fos.flush();
-                    }
-                    fos.close();
-                    bis.close();
-                    is.close();
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
-
-    }
+    /**
+     * retrofit+rxJava
+     */
     private void requestGitHubContributorsByRxJava(){
 
         mSubscriptions.add(
@@ -453,12 +418,15 @@ public class MainActivity extends FragmentActivity{
                             @Override
                             public void onNext(List<Contributor> contributors) {
                                 for (Contributor c : contributors) {
-                                    Log.d("TAG","login:"+c.getLogin()+"  contributions:"+c.getContributions());
+                                    Log.d("TAG", "login:" + c.getLogin() + "  contributions:" + c.getContributions());
                                 }
                             }
                         }));
     }
 
+    /**
+     * retrofit+rxJava
+     */
     private void requestGitHubContributorsWithFullUserInfo(){
         mSubscriptions.add(mGitHubService.contributorsByRxJava(mUserName, mRepo)
                 .flatMap(new Func1<List<Contributor>, Observable<Contributor>>() {
@@ -505,11 +473,74 @@ public class MainActivity extends FragmentActivity{
                     public void onNext(Pair<User, Contributor> pair) {
                         User user = pair.first;
                         Contributor contributor = pair.second;
-                        Log.d(TAG,"name:"+user.getName());
-                        Log.d(TAG,"contributions:"+contributor.getContributions());
-                        Log.d(TAG,"email:"+user.getEmail());
+                        Log.d(TAG, "name:" + user.getName());
+                        Log.d(TAG, "contributions:" + contributor.getContributions());
+                        Log.d(TAG, "email:" + user.getEmail());
 
                     }
                 }));
+    }
+
+
+    private void retrofitDownload(){
+        //监听下载进度
+        final ProgressListener progressListener = new ProgressListener() {
+            @Override
+            public void update(long bytesRead, long contentLength, boolean done) {
+                Log.e("-----",(Looper.getMainLooper() == Looper.myLooper()) +"");
+                System.out.format("%d%% done\n", (100 * bytesRead) / contentLength);
+            }
+        };
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
+        //添加拦截器，自定义ResponseBody，添加下载进度
+        clientBuilder.networkInterceptors().add(new Interceptor() {
+            @Override public okhttp3.Response intercept(Chain chain) throws IOException {
+                okhttp3.Response originalResponse = chain.proceed(chain.request());
+                return originalResponse.newBuilder().body(
+                        new ProgressResponseBody(originalResponse.body(), progressListener))
+                        .build();
+
+            }
+        });
+        OkHttpClient client =clientBuilder.build();
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl("http://msoftdl.360.cn");
+        DownloadAndUploadApi retrofit = retrofitBuilder
+                .client(client)
+                .build().create(DownloadAndUploadApi.class);
+
+        Call<ResponseBody> call = retrofit.retrofitDownload();
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+                    InputStream is = response.body().byteStream();
+                    File file = new File(Environment.getExternalStorageDirectory(), "12345.apk");
+                    FileOutputStream fos = new FileOutputStream(file);
+                    BufferedInputStream bis = new BufferedInputStream(is);
+                    byte[] buffer = new byte[1024];
+                    int len;
+                    int total = 0;
+                    while ((len = bis.read(buffer)) != -1) {
+                        fos.write(buffer, 0, len);
+                        total += len;
+                        fos.flush();
+                    }
+                    fos.close();
+                    bis.close();
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
+
     }
 }

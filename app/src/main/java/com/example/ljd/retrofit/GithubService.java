@@ -19,8 +19,9 @@ public class GitHubService {
 
     private GitHubService() { }
 
-    public static GitHubApi createGitHubService() {
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder().addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+    public static <T>T createGitHubService(final Class<T> service) {
+        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("https://api.github.com/");
 
@@ -41,7 +42,7 @@ public class GitHubService {
                 });
         OkHttpClient client = clientBuilder.build();
         retrofitBuilder.client(client);
-        return retrofitBuilder.build().create(GitHubApi.class);
+        return retrofitBuilder.build().create(service);
     }
 
 }
