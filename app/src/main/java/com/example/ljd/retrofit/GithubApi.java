@@ -9,12 +9,15 @@ import java.util.Map;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
@@ -37,7 +40,7 @@ public interface GitHubApi {
             "name:ljd"
     })
     @GET("repos/{owner}/{repo}/contributors")
-    Call<ResponseBody> contributorsAndAddHeader(@Path("owner") String owner, @Path("repo") String repo);
+    Call<List<Contributor>> contributorsAndAddHeader(@Path("owner") String owner, @Path("repo") String repo);
 
     @GET("search/repositories")
     Call<RetrofitBean> queryRetrofitByGetCall(@Query("q")String owner,
@@ -58,6 +61,15 @@ public interface GitHubApi {
     @FormUrlEncoded
     @POST("search/repositories")
     Call<RetrofitBean> queryRetrofitByPostFieldMap(@FieldMap Map<String,String> fieldMap);
+
+    @Multipart
+    @POST("search/repositories")
+    Call<RetrofitBean> queryRetrofitByMultipart(@Part("q")String owner,
+                                                @Part("since")String time,
+                                                @Part("page")int page,
+                                                @Part("per_page")int per_Page);
+    @POST("users/new")
+    Call<User> create(@Body User user);
 
     @GET("repos/{owner}/{repo}/contributors")
     Observable<List<Contributor>> contributorsByRxJava(@Path("owner") String owner,

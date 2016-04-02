@@ -29,17 +29,7 @@ public class GitHubService {
 
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        clientBuilder.addInterceptor(httpLoggingInterceptor)
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public Response intercept(Chain chain) throws IOException {
-                        Request request = chain.request();
-                        Request newReq = request.newBuilder()
-                                .addHeader("AddHeaderByInterceptor", "add success")
-                                .build();
-                        return chain.proceed(newReq);
-                    }
-                });
+        clientBuilder.addInterceptor(httpLoggingInterceptor);
         OkHttpClient client = clientBuilder.build();
         retrofitBuilder.client(client);
         return retrofitBuilder.build().create(service);
