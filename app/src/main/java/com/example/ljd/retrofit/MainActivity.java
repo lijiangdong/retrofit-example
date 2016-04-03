@@ -421,9 +421,9 @@ public class MainActivity extends FragmentActivity{
     private void retrofitDownload(){
         //监听下载进度
         final ProgressListener progressListener = new ProgressListener() {
+            //该方法在子线程中运行，不能进行UI操作
             @Override
             public void update(long bytesRead, long contentLength, boolean done) {
-                Log.e("-----",(Looper.getMainLooper() == Looper.myLooper()) +"");
                 System.out.format("%d%% done\n", (100 * bytesRead) / contentLength);
             }
         };
