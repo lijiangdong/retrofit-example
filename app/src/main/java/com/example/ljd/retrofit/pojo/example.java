@@ -3,7 +3,8 @@ package com.example.ljd.retrofit.pojo;
 /**
  * Created by ljd on 4/2/16.
  */
-public class example {
+public class Example {
+
 
     /**
      * type : object

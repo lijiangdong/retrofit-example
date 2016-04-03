@@ -67,28 +67,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <Button
-            android:id="@+id/btn_post_field"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_width="0dip"
-            android:textSize="14sp"
-            android:text="post请求(Field)"
-            />
-        <Button
-            android:id="@+id/btn_post_field_map"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_width="0dip"
-            android:textSize="14sp"
-            android:text="post请求(FieldMap)"
-            />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
             android:id="@+id/btn_rxJava_retrofit_contributors"
             android:layout_weight="1"
             android:layout_height="wrap_content"
@@ -106,25 +84,12 @@
             />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btn_download_retrofit"
+        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/btn_download_retrofit"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_width="0dip"
-            android:textSize="14sp"
-            android:text="download"
-            />
-        <Button
-            android:id="@+id/btn_upload_retrofit"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_width="0dip"
-            android:textSize="14sp"
-            android:text="upload"
-            />
-    </LinearLayout>
+        android:layout_width="0dip"
+        android:textSize="14sp"
+        android:text="download"
+        />
 </LinearLayout>

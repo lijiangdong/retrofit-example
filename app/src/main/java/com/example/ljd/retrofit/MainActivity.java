@@ -29,12 +29,9 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Interceptor;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
-import okio.BufferedSink;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -97,8 +94,6 @@ public class MainActivity extends FragmentActivity{
             R.id.btn_rxJava_retrofit_contributors,
             R.id.btn_rxJava_retrofit_contributors_with_user_info,
             R.id.btn_download_retrofit,
-            R.id.btn_post_field,
-            R.id.btn_post_field_map
     })
     public void onClickButton(View v){
         Map<String,String> queryMap = new HashMap<>();
@@ -134,14 +129,6 @@ public class MainActivity extends FragmentActivity{
             //通过get请求，使用@QueryMap
             case R.id.btn_retrofit_get_query_map:
                 requestQueryRetrofitByGet(queryMap);
-                break;
-            //通过post请求，使用Field
-            case R.id.btn_post_field:
-                requestQueryRetrofitByPost(null);
-                break;
-            //通过post请求，使用FieldMap
-            case R.id.btn_post_field_map:
-                requestQueryRetrofitByPost(queryMap);
                 break;
             //rxJava+retrofit
             case R.id.btn_rxJava_retrofit_contributors:
@@ -268,7 +255,7 @@ public class MainActivity extends FragmentActivity{
             @Override
             public void onResponse(Call<List<Contributor>> call, Response<List<Contributor>> response) {
                 List<Contributor> contributorList = response.body();
-                for (Contributor contributor : contributorList){
+                for (Contributor contributor : contributorList) {
                     Log.d("login", contributor.getLogin());
                     Log.d("contributions", contributor.getContributions() + "");
                 }
@@ -335,45 +322,6 @@ public class MainActivity extends FragmentActivity{
                     Owner owner = item.getOwner();
                     Log.d(TAG, "login:" + owner.getLogin());
                     Log.d(TAG, "type:" + owner.getType());
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<RetrofitBean> call, Throwable t) {
-
-            }
-        });
-    }
-
-    /**
-     * post请求
-     * @param fieldMap
-     */
-    private void requestQueryRetrofitByPost(Map<String,String> fieldMap){
-
-        Call<RetrofitBean> call;
-        if (fieldMap == null || fieldMap.size() == 0){
-            call = mGitHubService.queryRetrofitByPostField("retrofit", "2016-04-02", 1, 3);
-        } else {
-            call = mGitHubService.queryRetrofitByPostFieldMap(fieldMap);
-        }
-
-        call.enqueue(new Callback<RetrofitBean>() {
-            @Override
-            public void onResponse(Call<RetrofitBean> call, Response<RetrofitBean> response) {
-                RetrofitBean retrofitBean = response.body();
-                List<Item> list = retrofitBean.getItems();
-                Log.d(TAG,"total:" + retrofitBean.getTotalCount());
-                Log.d(TAG,"incompleteResults:" + retrofitBean.getIncompleteResults());
-                Log.d(TAG,"----------------------");
-                for (Item item : list){
-                    Log.d(TAG,"name:"+item.getName());
-                    Log.d(TAG,"full_name:"+item.getFull_name());
-                    Log.d(TAG,"description:"+item.getDescription());
-                    Owner owner = item.getOwner();
-                    Log.d(TAG,"login:"+owner.getLogin());
-                    Log.d(TAG,"type:"+owner.getType());
                 }
 
             }
@@ -495,9 +443,9 @@ public class MainActivity extends FragmentActivity{
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("http://msoftdl.360.cn");
-        DownloadAndUploadApi retrofit = retrofitBuilder
+        DownloadApi retrofit = retrofitBuilder
                 .client(client)
-                .build().create(DownloadAndUploadApi.class);
+                .build().create(DownloadApi.class);
 
         Call<ResponseBody> call = retrofit.retrofitDownload();
         call.enqueue(new Callback<ResponseBody>() {
@@ -510,10 +458,8 @@ public class MainActivity extends FragmentActivity{
                     BufferedInputStream bis = new BufferedInputStream(is);
                     byte[] buffer = new byte[1024];
                     int len;
-                    int total = 0;
                     while ((len = bis.read(buffer)) != -1) {
                         fos.write(buffer, 0, len);
-                        total += len;
                         fos.flush();
                     }
                     fos.close();

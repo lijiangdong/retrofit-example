@@ -1,12 +1,14 @@
 package com.example.ljd.retrofit;
 
 import com.example.ljd.retrofit.pojo.Contributor;
+import com.example.ljd.retrofit.pojo.Example;
 import com.example.ljd.retrofit.pojo.RetrofitBean;
 import com.example.ljd.retrofit.pojo.User;
 
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -51,25 +53,7 @@ public interface GitHubApi {
     @GET("search/repositories")
     Call<RetrofitBean> queryRetrofitByGetCallMap(@QueryMap Map<String,String> map);
 
-    @FormUrlEncoded
-    @POST("search/repositories")
-    Call<RetrofitBean> queryRetrofitByPostField(@Field("q")String owner,
-                                            @Field("since")String time,
-                                            @Field("page")int page,
-                                            @Field("per_page")int per_Page);
 
-    @FormUrlEncoded
-    @POST("search/repositories")
-    Call<RetrofitBean> queryRetrofitByPostFieldMap(@FieldMap Map<String,String> fieldMap);
-
-    @Multipart
-    @POST("search/repositories")
-    Call<RetrofitBean> queryRetrofitByMultipart(@Part("q")String owner,
-                                                @Part("since")String time,
-                                                @Part("page")int page,
-                                                @Part("per_page")int per_Page);
-    @POST("users/new")
-    Call<User> create(@Body User user);
 
     @GET("repos/{owner}/{repo}/contributors")
     Observable<List<Contributor>> contributorsByRxJava(@Path("owner") String owner,
