@@ -1,13 +1,13 @@
 package com.example.ljd.retrofit;
 
-import android.os.Environment;
-import android.os.Looper;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 
+import com.example.ljd.retrofit.download.DownloadActivity;
 import com.example.ljd.retrofit.pojo.Contributor;
 import com.example.ljd.retrofit.pojo.Item;
 import com.example.ljd.retrofit.pojo.Owner;
@@ -16,11 +16,7 @@ import com.example.ljd.retrofit.pojo.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +24,6 @@ import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -140,7 +135,8 @@ public class MainActivity extends FragmentActivity{
                 break;
             //文件下载
             case R.id.btn_download_retrofit:
-                retrofitDownload();
+                Intent intent = new Intent(this, DownloadActivity.class);
+                startActivity(intent);
                 break;
 
         }
@@ -417,64 +413,4 @@ public class MainActivity extends FragmentActivity{
                 }));
     }
 
-
-    private void retrofitDownload(){
-        //监听下载进度
-        final ProgressListener progressListener = new ProgressListener() {
-            //该方法在子线程中运行，不能进行UI操作
-            @Override
-            public void update(long bytesRead, long contentLength, boolean done) {
-                System.out.format("%d%% done\n", (100 * bytesRead) / contentLength);
-            }
-        };
-        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        //添加拦截器，自定义ResponseBody，添加下载进度
-        clientBuilder.networkInterceptors().add(new Interceptor() {
-            @Override public okhttp3.Response intercept(Chain chain) throws IOException {
-                okhttp3.Response originalResponse = chain.proceed(chain.request());
-                return originalResponse.newBuilder().body(
-                        new ProgressResponseBody(originalResponse.body(), progressListener))
-                        .build();
-
-            }
-        });
-        OkHttpClient client =clientBuilder.build();
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .addConverterFactory(GsonConverterFactory.create())
-                .baseUrl("http://msoftdl.360.cn");
-        DownloadApi retrofit = retrofitBuilder
-                .client(client)
-                .build().create(DownloadApi.class);
-
-        Call<ResponseBody> call = retrofit.retrofitDownload();
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                try {
-                    InputStream is = response.body().byteStream();
-                    File file = new File(Environment.getExternalStorageDirectory(), "12345.apk");
-                    FileOutputStream fos = new FileOutputStream(file);
-                    BufferedInputStream bis = new BufferedInputStream(is);
-                    byte[] buffer = new byte[1024];
-                    int len;
-                    while ((len = bis.read(buffer)) != -1) {
-                        fos.write(buffer, 0, len);
-                        fos.flush();
-                    }
-                    fos.close();
-                    bis.close();
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-            }
-        });
-
-    }
 }

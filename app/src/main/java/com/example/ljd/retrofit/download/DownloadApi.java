@@ -1,4 +1,4 @@
-package com.example.ljd.retrofit;
+package com.example.ljd.retrofit.download;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
