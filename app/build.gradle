@@ -31,4 +31,5 @@ dependencies {
     compile 'com.squareup.retrofit2:adapter-rxjava:2.0.1'
     compile 'io.reactivex:rxandroid:1.1.0'
     compile project(':library')
+    compile files('/Users/ljd/Documents/study/android/AndroidStudioProjects/retrofit-example/libs/android-async-http-1.4.9.jar')
 }

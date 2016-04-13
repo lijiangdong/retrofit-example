@@ -2,12 +2,14 @@
 package com.example.ljd.retrofit.download;
 
 import android.os.Environment;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.example.ljd.retrofit.R;
-import com.ljd.retrofit.progress.ProgressListener;
-import com.ljd.retrofit.progress.ProgressResponseBody;
+import com.ljd.retrofit.progress.DownloadProgressHandler;
+import com.ljd.retrofit.progress.ProgressHelper;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -17,8 +19,6 @@ import java.io.InputStream;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,33 +51,22 @@ public class DownloadActivity extends AppCompatActivity {
 
     private void retrofitDownload(){
         //监听下载进度
-        final ProgressListener progressListener = new ProgressListener() {
-            //该方法在子线程中运行，不能进行UI操作
-            @Override
-            public void update(long bytesRead, long contentLength, boolean done) {
-                System.out.format("%d%% done\n", (100 * bytesRead) / contentLength);
-            }
-        };
 
-        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder();
-        //添加拦截器，自定义ResponseBody，添加下载进度
-        clientBuilder.networkInterceptors().add(new Interceptor() {
-            @Override public okhttp3.Response intercept(Chain chain) throws IOException {
-                okhttp3.Response originalResponse = chain.proceed(chain.request());
-                return originalResponse.newBuilder().body(
-                        new ProgressResponseBody(originalResponse.body(), progressListener))
-                        .build();
-
-            }
-        });
-        OkHttpClient client =clientBuilder.build();
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("http://msoftdl.360.cn");
         DownloadApi retrofit = retrofitBuilder
-                .client(client)
+                .client(ProgressHelper.addProgress(null))
                 .build().create(DownloadApi.class);
+
+        ProgressHelper.setProgressHandler(new DownloadProgressHandler() {
+            @Override
+            protected void onProgress(long bytesRead, long contentLength, boolean done) {
+                Log.e("是否在主线程中运行", String.valueOf(Looper.getMainLooper() == Looper.myLooper()));
+                Log.e("onProgress",String.format("%d%% done\n",(100 * bytesRead) / contentLength));
+            }
+        });
 
         Call<ResponseBody> call = retrofit.retrofitDownload();
         call.enqueue(new Callback<ResponseBody>() {
