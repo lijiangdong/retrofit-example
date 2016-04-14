@@ -1,6 +1,7 @@
 
 package com.example.ljd.retrofit.download;
 
+import android.app.ProgressDialog;
 import android.os.Environment;
 import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
@@ -51,6 +52,13 @@ public class DownloadActivity extends AppCompatActivity {
 
     private void retrofitDownload(){
         //监听下载进度
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setProgressNumberFormat("%1d KB/%2d KB");
+        dialog.setTitle("下载");
+        dialog.setMessage("正在下载，请稍后...");
+        dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        dialog.setCancelable(false);
+        dialog.show();
 
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -65,6 +73,13 @@ public class DownloadActivity extends AppCompatActivity {
             protected void onProgress(long bytesRead, long contentLength, boolean done) {
                 Log.e("是否在主线程中运行", String.valueOf(Looper.getMainLooper() == Looper.myLooper()));
                 Log.e("onProgress",String.format("%d%% done\n",(100 * bytesRead) / contentLength));
+                Log.e("done","--->" + String.valueOf(done));
+                dialog.setMax((int) (contentLength/1024));
+                dialog.setProgress((int) (bytesRead/1024));
+
+                if(done){
+                    dialog.dismiss();
+                }
             }
         });
 
