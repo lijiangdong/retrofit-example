@@ -15,7 +15,7 @@ public class ProgressHelper {
     private static ProgressBean progressBean = new ProgressBean();
     private static ProgressHandler mProgressHandler;
 
-    public static OkHttpClient addProgress(OkHttpClient.Builder builder){
+    public static OkHttpClient.Builder addProgress(OkHttpClient.Builder builder){
 
         if (builder == null){
             builder = new OkHttpClient.Builder();
@@ -25,10 +25,11 @@ public class ProgressHelper {
             //该方法在子线程中运行
             @Override
             public void update(long bytesRead, long contentLength, boolean done) {
-//                Log.d("progress:",String.format("%d%% done\n",(100 * bytesRead) / contentLength));
+                Log.d("progress:",String.format("%d%% done\n",(100 * bytesRead) / contentLength));
                 if (mProgressHandler == null){
-//                    throw new Exception("null pointer exception");
+                    return;
                 }
+
                 progressBean.setBytesRead(bytesRead);
                 progressBean.setContentLength(contentLength);
                 progressBean.setDone(done);
@@ -49,7 +50,7 @@ public class ProgressHelper {
             }
         });
 
-        return builder.build();
+        return builder;
     }
 
     public static void setProgressHandler(ProgressHandler progressHandler){

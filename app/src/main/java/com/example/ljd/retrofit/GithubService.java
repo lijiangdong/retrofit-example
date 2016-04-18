@@ -1,6 +1,8 @@
 package com.example.ljd.retrofit;
 
 
+import com.ljd.retrofit.progress.ProgressHelper;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -18,11 +20,11 @@ public class GitHubService {
     public static <T>T createRetrofitService(final Class<T> service) {
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
         httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                .addInterceptor(httpLoggingInterceptor)
-                .build();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .addInterceptor(httpLoggingInterceptor);
+
         Retrofit retrofit = new Retrofit.Builder()
-                .client(okHttpClient)
+                .client(ProgressHelper.addProgress(builder).build())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("https://api.github.com/")

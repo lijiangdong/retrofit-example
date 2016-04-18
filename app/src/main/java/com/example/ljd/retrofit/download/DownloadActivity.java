@@ -20,6 +20,7 @@ import java.io.InputStream;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -64,8 +65,9 @@ public class DownloadActivity extends AppCompatActivity {
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .baseUrl("http://msoftdl.360.cn");
+        OkHttpClient.Builder builder = ProgressHelper.addProgress(null);
         DownloadApi retrofit = retrofitBuilder
-                .client(ProgressHelper.addProgress(null))
+                .client(builder.build())
                 .build().create(DownloadApi.class);
 
         ProgressHelper.setProgressHandler(new DownloadProgressHandler() {
