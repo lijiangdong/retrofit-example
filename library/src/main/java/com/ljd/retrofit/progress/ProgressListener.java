@@ -9,5 +9,5 @@ public interface ProgressListener {
      * @param contentLength 总字节数
      * @param done          是否下载完成
      */
-    void update(long bytesRead, long contentLength, boolean done);
+    void onProgress(long bytesRead, long contentLength, boolean done);
 }

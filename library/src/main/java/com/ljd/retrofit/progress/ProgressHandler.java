@@ -13,7 +13,7 @@ public abstract class ProgressHandler {
 
     protected abstract void handleMessage(Message message);
 
-    protected abstract void onProgress(long bytesRead, long contentLength, boolean done);
+    protected abstract void onProgress(long progress, long total, boolean done);
 
     protected static class ResponseHandler extends Handler{
 

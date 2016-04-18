@@ -24,14 +24,14 @@ public class ProgressHelper {
         final ProgressListener progressListener = new ProgressListener() {
             //该方法在子线程中运行
             @Override
-            public void update(long bytesRead, long contentLength, boolean done) {
-                Log.d("progress:",String.format("%d%% done\n",(100 * bytesRead) / contentLength));
+            public void onProgress(long progress, long total, boolean done) {
+                Log.d("progress:",String.format("%d%% done\n",(100 * progress) / total));
                 if (mProgressHandler == null){
                     return;
                 }
 
-                progressBean.setBytesRead(bytesRead);
-                progressBean.setContentLength(contentLength);
+                progressBean.setBytesRead(progress);
+                progressBean.setContentLength(total);
                 progressBean.setDone(done);
                 mProgressHandler.sendMessage(progressBean);
 
