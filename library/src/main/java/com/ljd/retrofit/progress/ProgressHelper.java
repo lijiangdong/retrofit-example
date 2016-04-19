@@ -56,6 +56,4 @@ public class ProgressHelper {
     public static void setProgressHandler(ProgressHandler progressHandler){
         mProgressHandler = progressHandler;
     }
-
-
 }
