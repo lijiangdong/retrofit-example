@@ -24,6 +24,7 @@ public abstract class DownloadProgressHandler extends ProgressHandler{
             case DOWNLOAD_PROGRESS:
                 ProgressBean progressBean = (ProgressBean)message.obj;
                 onProgress(progressBean.getBytesRead(),progressBean.getContentLength(),progressBean.isDone());
+
         }
     }
 

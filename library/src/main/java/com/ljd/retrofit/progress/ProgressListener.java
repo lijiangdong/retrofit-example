@@ -5,9 +5,9 @@ package com.ljd.retrofit.progress;
  */
 public interface ProgressListener {
     /**
-     * @param bytesRead     已下载字节数
-     * @param contentLength 总字节数
-     * @param done          是否下载完成
+     * @param progress     已经下载或上传字节数
+     * @param total        总字节数
+     * @param done         是否完成
      */
-    void onProgress(long bytesRead, long contentLength, boolean done);
+    void onProgress(long progress, long total, boolean done);
 }

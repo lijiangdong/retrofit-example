@@ -27,7 +27,6 @@ public class ProgressResponseBody extends ResponseBody {
         return responseBody.contentType();
     }
 
-
     @Override
     public long contentLength() {
         return responseBody.contentLength();
