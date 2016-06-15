@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "com.asxample.ljd.retrofit"
+        applicationId "com.Example.ljd.retrofit"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
